@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { UniqueConstraintError } = require('sequelize/lib/errors');
 
-router.post('/register', async (req, res) => {
+router.post('/user', async (req, res) => {
   let { email, password, firstName, lastName} = req.body;
 
   try {
