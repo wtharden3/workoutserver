@@ -5,6 +5,11 @@ const app = express();
 
 const db = require('./db');
 
+const controllers = require('./controllers');
+
+app.use(express.json());
+
+app.use('/user', controllers.usercontroller);
 
 db.authenticate()
 .then( () => db.sync())
