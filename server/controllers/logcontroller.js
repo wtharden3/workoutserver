@@ -31,31 +31,27 @@ router.get('/', validateSession, (req, res) => {
     where: { owner_id: ownerid },
   })
     .then(log => {
-     
-        res.status(200).json({
-          log,
-          OwnerID: ownerid
-        });
-      
+      res.status(200).json({
+        log,
+        OwnerID: ownerid,
+      });
     })
     .catch(err => res.status(500).json({ error: err }));
 });
 
-// router.get('/', (req, res) => {
-//   Log.findAll()
-//     .then(log => {
-//       // console.log('log------> ', log);
-//       if (log) {
-//         res.status(200).json(log);
-//       } else {
-//         res.status(500).json('There are no logs');
-//       }
-//     })
-//     .catch(err => {
-//       res.status(500).json({
-//         error: err,
-//       });
-//     });
-// });
+router.get('/:id', validateSession, (req, res) => {
+  let ownerid = req.params.id;
+  Log.findAll({
+    where: { owner_id: ownerid },
+  })
+    .then(log => {
+      res.status(200).json({
+        log,
+        OwnerID: ownerid,
+      });
+    })
+    .catch(err => res.status(500).json({ error: err }));
+});
+
 
 module.exports = router;
