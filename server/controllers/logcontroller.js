@@ -1,49 +1,61 @@
 const router = require('express').Router();
-const {Log} = require('../models');
+const { Log } = require('../models');
+const validateSession = require('../middleware/validateSession');
 
-router.get('/', (req, res) => {
-  //get all logs for an individual user
-  //so they must be logined in
-  //findAll()
-  Log.findAll()
-  .then(log => {
-    if(log){
-      res.status(200).json(log)
-    } else {
-      res.status(500).json('There are no logs')
-    }
-  })
-  .catch(err => {
-    res.status(500).json({
-      error: err
-    })
-  })
-})
-
-router.post('/', (req, res) => {
-  //allow users to create a workout log with descriptions, definitions, results, and owner properties
+router.post('/', async (req, res) => {
   try {
-    const{owner, description, definition, result} = Log.create()
-  } catch (error) {
-    
+    const { description, definition, result } = req.body;
+
+    let newLog = await Log.create({
+      owner_id: req.user.id,
+      description,
+      definition,
+      result,
+    });
+    res.status(200).json({
+      Log: newLog,
+      message: 'New Log Created',
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Error: Could not create Log.',
+    });
   }
-})
+});
 
-router.get('/:id', (req, res) => {
-  //gets individual logs by id for an individual user.
-  //findAll()
-})
+//get all logs for individual user
+router.get('/', validateSession, (req, res) => {
+  let ownerid = req.user.id;
+  Log.findAll({
+    where: { owner_id: ownerid },
+  })
+    .then(log => {
+     
+        res.status(200).json({
+          log,
+          OwnerID: ownerid
+        });
+      
+    })
+    .catch(err => res.status(500).json({ error: err }));
+});
 
-router.put('/:id', (req, res) => {
-  //allows individual logs to be updated by the user
-  //the user must be logged in
-  //findOne()
-})
+// router.get('/', (req, res) => {
+//   Log.findAll()
+//     .then(log => {
+//       // console.log('log------> ', log);
+//       if (log) {
+//         res.status(200).json(log);
+//       } else {
+//         res.status(500).json('There are no logs');
+//       }
+//     })
+//     .catch(err => {
+//       res.status(500).json({
+//         error: err,
+//       });
+//     });
+// });
 
-router.delete('/:id', (req, res) => {
-  //allows individual logs to be deleted by a user
-  //must be logged in
-  //findOne
-})
-
-
+module.exports = router;
